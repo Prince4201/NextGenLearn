@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assignments - NextGen Learn</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #fff;
+      background-color: #11111190;
+      margin: 0;
+      padding: 0;
+    }
+
+    #bgVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      z-index: -1;
+      opacity: 0.1;
+    }
+
+    .container {
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #00ffd5;
+    }
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #ff4b5c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .logout-btn:hover {
+      background-color: #ff1a3d;
+    }
+    .logout-btn:focus {
+      outline: none;
+    }
+    
+
+    .assignment-card {
+      background-color: #222222a2;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+    .assignment-card:hover {
+      background-color: #333333a2;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+    .assignment-card h3,
+    .assignment-card p {
+      color: #fff;
+    }
+    .assignment-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .assignment-card p {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .assignment-card button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .assignment-card h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .assignment-card p {
+      margin-bottom: 0.3rem;
+    }
+
+    .assignment-card button {
+      padding: 0.5rem 1rem;
+      background-color: #4caf50;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+    .assignment-card button:hover {
+      background-color: #45a049;
+    }
+    .assignment-card button:focus {
+      outline: none;
+    }
+    .assignment-card button:active {
+      transform: scale(0.98);
+    }
+    .assignment-card button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    #submitModal {
+      display: none;
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -30%);
+      background-color: #333;
+      padding: 1.5rem;
+      border-radius: 10px;
+      z-index: 10;
+    }
+    #submitModal h3 {
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    #submitModal input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    #submitModal button {
+      margin-right: 10px;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 5;
+    }
+    .overlay:active {
+      cursor: pointer;
+    }
+    .overlay:focus {
+      outline: none;
+    }
+
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="bgVideo">
+    <source src="12778084_1920_1080_30fps.mp4" type="video/mp4" />
+  </video>
+
+  <div class="overlay" id="overlay" onclick="closeModal()"></div>
+
+  <div class="container">
+    <h1>Assignments</h1>
+    <div id="assignmentsContainer"></div>
+  </div>
+
+  <!-- Modal for Submission -->
+  <div id="submitModal">
+    <h3>Submit Assignment</h3>
+    <input type="text" id="submissionLink" placeholder="Paste your GitHub or Drive link" />
+    <button onclick="submitAssignment()">Submit</button>
+    <button onclick="closeModal()">Cancel</button>
+  </div>
+
+  <script>
+    const assignments = [
+      {
+        id: '1',
+        title: "Full Stack Project",
+        description: "Create a full-stack web app and submit code via GitHub.",
+        dueDate: "2025-05-25"
+      },
+      {
+        id: '2',
+        title: "AI/ML Assignment",
+        description: "Build a model using Python and upload report & code.",
+        dueDate: "2025-06-01"
+      },
+      {
+        id: '3',
+        title: "Responsive Portfolio",
+        description: "Design your personal portfolio and host it on Netlify.",
+        dueDate: "2025-05-28"
+      }
+    ];
+
+    let selectedAssignmentId = null;
+
+    function loadAssignments() {
+      const container = document.getElementById('assignmentsContainer');
+      container.innerHTML = '';
+
+      assignments.forEach(assignment => {
+        const card = document.createElement('div');
+        card.className = 'assignment-card';
+        card.innerHTML = `
+          <h3>${assignment.title}</h3>
+          <p>${assignment.description}</p>
+          <p><strong>Due:</strong> ${assignment.dueDate}</p>
+          <button onclick="openModal('${assignment.id}')">Submit</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openModal(assignmentId) {
+      selectedAssignmentId = assignmentId;
+      document.getElementById('submitModal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closeModal() {
+      selectedAssignmentId = null;
+      document.getElementById('submitModal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('submissionLink').value = '';
+    }
+
+    function submitAssignment() {
+      const link = document.getElementById('submissionLink').value;
+      if (!link || !link.startsWith('http')) {
+        alert("Please enter a valid link (Drive or GitHub).");
+        return;
+      }
+
+      const assignment = assignments.find(a => a.id === selectedAssignmentId);
+      alert(`✅ Submitted:\n${assignment.title}\nLink: ${link}`);
+      closeModal();
+    }
+
+    // Load on page ready
+    window.onload = loadAssignments;
+  </script>
+</body>
+</html>

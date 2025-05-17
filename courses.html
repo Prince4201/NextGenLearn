@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Courses - NextGen Learn</title>
+  <link rel="icon" href="1.png" type="image/x-icon">
+  <style>
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100%;
+      overflow-x: hidden;
+      color: white;
+      background: #0e0e0e80;
+    }
+
+    #bgVideo {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      z-index: -1;
+      filter: brightness(0.4);
+    }
+
+    .container {
+      padding: 2rem;
+      animation: fadeIn 1s ease forwards;
+      opacity: 0;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #00ffd5;
+    }
+
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #ff4b5c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .content-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background-color: rgba(255, 255, 255, 0.363);
+      border-radius: 15px;
+      padding: 1.5rem;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s ease forwards;
+      animation-delay: var(--delay);
+      transition: transform 0.3s ease;
+      cursor: default;
+    }
+    .feature-card:hover {
+      transform: scale(1.05);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      color: #00ffd5;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #e0e0e0;
+    }
+
+    .price {
+      font-weight: bold;
+      color: #ffd700;
+    }
+
+    .enroll-btn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background-color: #00ffd5;
+      border: none;
+      border-radius: 5px;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .enroll-btn:hover {
+      background-color: #00b3a6;
+    }
+
+    .or {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      color: #00ffd5;
+    }
+
+    #paymentModal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    .modal-content {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 10px;
+      color: black;
+      text-align: center;
+      width: 300px;
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    #upi {
+      margin: 10px auto;
+    }
+
+    .google-form-link {
+      margin-top: 15px;
+      display: block;
+      font-weight: bold;
+      color: #0077ff;
+    }
+    .google-form-link:hover {
+      text-decoration: underline;
+    }
+
+    .messageDiv {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .messageDiv.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="bgVideo">
+    <source src="12778084_1920_1080_30fps.mp4" type="video/mp4" />
+  </video>
+
+  <div class="container">
+    <button class="logout-btn" id="logout">🚪 Logout</button>
+    <header><h1>Courses</h1></header>
+
+    <section class="content-section" id="coursesList">
+      <!-- Courses will appear here -->
+    </section>
+  </div>
+
+  <!-- Payment Modal -->
+  <div id="paymentModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">✖</button>
+      <h3>Scan & Pay to Enroll</h3>
+      <p id="modalCourseName"></p>
+      <div id="upi"></div>
+      <a id="formLink" class="google-form-link" href="#" target="_blank">Go to Google Form</a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCL0gqMAs7GyX3cGGaeL0QLjOsh7w6QGkA",
+      authDomain: "nextgenlearn-75032.firebaseapp.com",
+      projectId: "nextgenlearn-75032",
+      storageBucket: "nextgenlearn-75032.appspot.com",
+      messagingSenderId: "750912407281",
+      appId: "1:750912407281:web:377193b7bd2c251fb14b50"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById('logout').addEventListener('click', () => {
+      signOut(auth).then(() => {
+        alert("Logged out successfully.");
+        window.location.href = "login.html";
+      });
+    });
+
+    const courses = [
+      {
+        title: "Full Stack Web Development",
+        description: "Learn HTML, CSS, JS, Node, React & MongoDB.",
+        price: 999,
+        formLink: "https://forms.gle/example1"
+      },
+      {
+        title: "AI & Machine Learning",
+        description: "Master ML models, Python, and data science tools.",
+        price: 1199,
+        formLink: "https://forms.gle/example2"
+      },
+      {
+        title: "Frontend Development",
+        description: "Become a frontend pro with React, Tailwind & more.",
+        price: 799,
+        formLink: "https://forms.gle/example3"
+      }
+    ];
+
+    const courseList = document.getElementById('coursesList');
+
+    courses.forEach((course, index) => {
+      const div = document.createElement('div');
+      div.className = "feature-card";
+      div.style.setProperty('--delay', `${index * 0.2}s`);  // stagger animation delay
+      div.innerHTML = `
+        <h3>${course.title}</h3>
+        <p>${course.description}</p>
+        <p class="price">₹${course.price}</p>
+        <button class="enroll-btn" onclick='openPayment("${course.title}", ${course.price}, "${course.formLink}")'>Enroll</button>
+      `;
+      courseList.appendChild(div);
+    });
+
+    window.openPayment = function(courseName, amount, formLink) {
+      document.getElementById("modalCourseName").innerText = courseName + " - ₹" + amount;
+      document.getElementById("formLink").href = formLink;
+
+      const upiUrl = `upi://pay?pa=prince05025646-1@oksbi&pn=PRINCE FOUNDATION&am=${amount}&cu=INR`;
+      document.getElementById("upi").innerHTML = "";
+      new QRCode(document.getElementById("upi"), {
+        text: upiUrl,
+        width: 150,
+        height: 150,
+        colorDark: "#000",
+        colorLight: "#fff"
+      });
+
+      document.getElementById("paymentModal").style.display = "flex";
+    };
+
+    window.closeModal = function() {
+      document.getElementById("paymentModal").style.display = "none";
+    };
+  </script>
+</body>
+</html>

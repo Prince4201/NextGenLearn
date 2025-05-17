@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resources - Tech Learning Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #121212;
+    color: #eee;
+    margin: 0; padding: 0;
+  }
+  #bgVideo {
+    position: fixed;
+    top: 0; left: 0;
+    min-width: 100%; min-height: 100%;
+    z-index: -1;
+    opacity: 0.07;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 2rem auto 4rem;
+    padding: 2rem;
+    background: rgba(30, 30, 30, 0.85);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 255, 150, 0.15);
+  }
+  h1 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 2.6rem;
+    margin-bottom: 1rem;
+    color: #00ff99;
+    text-shadow: 0 0 6px #00ff99aa;
+  }
+  #searchBar {
+    width: 100%;
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem;
+    border-radius: 25px;
+    border: none;
+    margin-bottom: 1.6rem;
+    background: #222;
+    color: #eee;
+    box-shadow: inset 0 0 8px #00ff9944;
+    transition: box-shadow 0.3s ease;
+  }
+  #searchBar:focus {
+    outline: none;
+    box-shadow: inset 0 0 12px #00ff99cc;
+  }
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 0.6rem 1.8rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    background: linear-gradient(135deg, #004d40, #00796b);
+    color: #b2dfdb;
+    user-select: none;
+    box-shadow: 0 4px 10px #00ff9940;
+    transition: background-color 0.4s, color 0.3s;
+  }
+  .tab.active, .tab:hover {
+    background: #00ff99;
+    color: #121212;
+    box-shadow: 0 6px 18px #00ff99cc;
+  }
+  .notes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+    gap: 1.4rem;
+  }
+  .note-card {
+    background: #1e1e1e;
+    border-radius: 18px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: 0 6px 20px #00ff9930;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .note-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px #00ff99cc;
+  }
+  .note-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #00e676;
+  }
+  .note-desc {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 1.1rem;
+    color: #b0f2c4;
+    flex-grow: 1;
+  }
+  .note-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  button {
+    background: #00ff99;
+    border: none;
+    border-radius: 25px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 600;
+    color: #121212;
+    cursor: pointer;
+    box-shadow: 0 4px 12px #00ff9966;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background: #00cc77;
+    box-shadow: 0 6px 20px #00cc7788;
+  }
+  a button {
+    background: #00c853;
+  }
+  a button:hover {
+    background: #009624;
+  }
+  .favorite {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #555;
+    user-select: none;
+    transition: color 0.3s ease;
+  }
+  .favorite.active {
+    color: gold;
+    text-shadow: 0 0 6px gold;
+  }
+  #viewerContainer {
+    margin-top: 2.5rem;
+    background: #222;
+    border-radius: 16px;
+    padding: 1.4rem;
+    box-shadow: 0 10px 25px #00ff9955;
+  }
+  #viewerTitle {
+    color: #00ff99;
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+  }
+  iframe {
+    width: 100%;
+    height: 650px;
+    border-radius: 12px;
+    border: none;
+    box-shadow: inset 0 0 20px #00ff9955;
+  }
+  @media (max-width: 700px) {
+    iframe {
+      height: 450px;
+    }
+  }
+
+  /* Recently Viewed */
+  #recentlyViewed {
+    margin-top: 3rem;
+  }
+  #recentlyViewed h2 {
+    color: #00ff99;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .recent-list {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .recent-item {
+    background: #333;
+    padding: 0.8rem 1rem;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px #00ff9944;
+    transition: background-color 0.3s;
+  }
+  .recent-item:hover {
+    background: #00ff99;
+    color: #121212;
+  }
+
+</style>
+</head>
+<body>
+
+<video autoplay muted loop id="bgVideo" playsinline>
+  <source src="12778084_1920_1080_30fps.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+<div class="container">
+  <h1>Technical Resources & Notes</h1>
+
+  <input type="text" id="searchBar" placeholder="Search notes by title or description..." />
+
+  <div class="tabs" aria-label="Category Tabs">
+    <div class="tab active" data-category="All" role="tab" tabindex="0" aria-selected="true">All</div>
+    <div class="tab" data-category="Full Stack" role="tab" tabindex="0">Full Stack</div>
+    <div class="tab" data-category="AI & ML" role="tab" tabindex="0">AI & ML</div>
+    <div class="tab" data-category="Cybersecurity" role="tab" tabindex="0">Cybersecurity</div>
+    <div class="tab" data-category="DevOps" role="tab" tabindex="0">DevOps</div>
+    <div class="tab" data-category="Data Science" role="tab" tabindex="0">Data Science</div>
+  </div>
+
+  <div class="notes-list" id="notesList" aria-live="polite"></div>
+
+  <div id="viewerContainer" style="display:none;" aria-live="polite" aria-label="Note viewer">
+    <h2 id="viewerTitle"></h2>
+    <iframe id="noteViewer" src="" title="Note Viewer"></iframe>
+  </div>
+
+  <section id="recentlyViewed" style="display:none;">
+    <h2>Recently Viewed</h2>
+    <div class="recent-list" id="recentList"></div>
+  </section>
+</div>
+
+<script>
+  // Notes data with technical subjects only
+  const notes = [
+    { id: 1, title: "Full Stack Development Guide", description: "Complete guide covering frontend and backend basics.", category: "Full Stack", file: "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf" },
+    { id: 2, title: "Intro to Machine Learning", description: "Basic ML concepts and algorithms.", category: "AI & ML", file: "https://cs.stanford.edu/people/karpathy/convnetjs/notes/lecture1.pdf" },
+    { id: 3, title: "Cybersecurity Fundamentals", description: "Understanding security principles and protocols.", category: "Cybersecurity", file: "https://www.us-cert.gov/sites/default/files/publications/US-CERT_Cybersecurity_Series_Handbook.pdf" },
+    { id: 4, title: "DevOps Best Practices", description: "Automation and CI/CD pipelines explained.", category: "DevOps", file: "https://pages.awscloud.com/rs/112-TZM-766/images/DevOps-Ebook.pdf" },
+    { id: 5, title: "Data Science Essentials", description: "Data analysis, statistics, and visualization basics.", category: "Data Science", file: "https://www.cs.cmu.edu/~tom/mlbook/NBayesLogReg.pdf" },
+    { id: 6, title: "Advanced React Techniques", description: "Hooks, context API, and performance optimizations.", category: "Full Stack", file: "https://reactjs.org/docs/hooks-intro.pdf" },
+    { id: 7, title: "Neural Networks Explained", description: "Deep learning fundamentals and architectures.", category: "AI & ML", file: "https://cs.stanford.edu/people/karpathy/convnetjs/notes/lecture2.pdf" },
+    { id: 8, title: "Cloud Security Guide", description: "Securing cloud infrastructure and services.", category: "Cybersecurity", file: "https://d0.awsstatic.com/whitepapers/aws-cloud-security-whitepaper.pdf" },
+    { id: 9, title: "Kubernetes for Beginners", description: "Container orchestration with Kubernetes.", category: "DevOps", file: "https://kubernetes.io/docs/tutorials/kubernetes-basics/" },
+    { id: 10, title: "Data Wrangling Techniques", description: "Cleaning and preparing data for analysis.", category: "Data Science", file: "https://www.kaggle.com/learn/data-cleaning" }
+  ];
+
+  // DOM references
+  const notesList = document.getElementById('notesList');
+  const searchBar = document.getElementById('searchBar');
+  const tabs = document.querySelectorAll('.tab');
+  const viewerContainer = document.getElementById('viewerContainer');
+  const viewerTitle = document.getElementById('viewerTitle');
+  const noteViewer = document.getElementById('noteViewer');
+  const recentlyViewedSection = document.getElementById('recentlyViewed');
+  const recentList = document.getElementById('recentList');
+
+  let currentCategory = "All";
+  let filteredNotes = notes;
+
+  // Pagination variables
+  const notesPerPage = 4;
+  let currentPage = 1;
+
+  // Render notes with pagination
+  function renderNotes(page = 1) {
+    notesList.innerHTML = '';
+    const start = (page - 1) * notesPerPage;
+    const end = start + notesPerPage;
+    const notesToShow = filteredNotes.slice(start, end);
+
+    if(notesToShow.length === 0) {
+      notesList.innerHTML = `<p style="text-align:center; color:#777;">No notes found.</p>`;
+      return;
+    }
+
+    notesToShow.forEach(note => {
+      const card = document.createElement('div');
+      card.className = 'note-card';
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-pressed', 'false');
+
+      card.innerHTML = `
+        <div class="note-title">${note.title}</div>
+        <div class="note-desc">${note.description}</div>
+        <div class="note-actions">
+          <button aria-label="View note ${note.title}" data-id="${note.id}">View</button>
+          <span class="favorite" role="checkbox" aria-checked="false" data-id="${note.id}" title="Mark as favorite">&#9734;</span>
+        </div>
+      `;
+      notesList.appendChild(card);
+    });
+
+    renderPagination();
+  }
+
+  // Pagination controls
+  function renderPagination() {
+    // Remove existing pagination if any
+    const existingPagination = document.getElementById('paginationControls');
+    if(existingPagination) existingPagination.remove();
+
+    if(filteredNotes.length <= notesPerPage) return; // no need pagination
+
+    const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
+    const pagination = document.createElement('div');
+    pagination.id = 'paginationControls';
+    pagination.style.marginTop = '1.5rem';
+    pagination.style.textAlign = 'center';
+
+    for(let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.style.margin = '0 6px';
+      btn.style.padding = '0.4rem 0.8rem';
+      btn.style.borderRadius = '50%';
+      btn.style.width = '38px';
+      btn.style.height = '38px';
+      btn.style.fontWeight = '700';
+      btn.style.backgroundColor = i === currentPage ? '#00ff99' : '#004d40';
+      btn.style.color = i === currentPage ? '#121212' : '#b2dfdb';
+      btn.style.border = 'none';
+      btn.style.cursor = 'pointer';
+
+      btn.addEventListener('click', () => {
+        currentPage = i;
+        renderNotes(currentPage);
+        window.scrollTo({top:0, behavior: 'smooth'});
+      });
+
+      pagination.appendChild(btn);
+    }
+    notesList.after(pagination);
+  }
+
+  // Filter notes by category and search
+  function filterNotes() {
+    const searchTerm = searchBar.value.toLowerCase();
+    filteredNotes = notes.filter(note => {
+      const matchCategory = (currentCategory === 'All') || (note.category === currentCategory);
+      const matchSearch = note.title.toLowerCase().includes(searchTerm) || note.description.toLowerCase().includes(searchTerm);
+      return matchCategory && matchSearch;
+    });
+    currentPage = 1;
+    renderNotes(currentPage);
+  }
+
+  // Update active tab style
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentCategory = tab.getAttribute('data-category');
+      filterNotes();
+    });
+    tab.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        tab.click();
+      }
+    });
+  });
+
+  // View note file in iframe viewer
+  notesList.addEventListener('click', e => {
+    if(e.target.tagName === 'BUTTON') {
+      const id = +e.target.getAttribute('data-id');
+      const note = notes.find(n => n.id === id);
+      if(note) {
+        viewerTitle.textContent = note.title;
+        noteViewer.src = note.file;
+        viewerContainer.style.display = 'block';
+        addToRecentlyViewed(note);
+      }
+    } else if (e.target.classList.contains('favorite')) {
+      toggleFavorite(e.target);
+    }
+  });
+
+  // Toggle favorite star
+  function toggleFavorite(el) {
+    const id = +el.getAttribute('data-id');
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    if(favorites.includes(id)) {
+      const idx = favorites.indexOf(id);
+      favorites.splice(idx, 1);
+      el.classList.remove('active');
+      el.setAttribute('aria-checked', 'false');
+    } else {
+      favorites.push(id);
+      el.classList.add('active');
+      el.setAttribute('aria-checked', 'true');
+    }
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }
+
+  // On page load, set favorites from localStorage
+  function setFavoritesFromStorage() {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    document.querySelectorAll('.favorite').forEach(el => {
+      const id = +el.getAttribute('data-id');
+      if(favorites.includes(id)) {
+        el.classList.add('active');
+        el.setAttribute('aria-checked', 'true');
+      }
+    });
+  }
+
+  // Recently Viewed functionality
+  function addToRecentlyViewed(note) {
+    let recent = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+
+    // Remove if already present to avoid duplicates
+    recent = recent.filter(n => n.id !== note.id);
+    recent.unshift({id: note.id, title: note.title, file: note.file});
+    if(recent.length > 5) recent.pop();
+
+    localStorage.setItem('recentlyViewed', JSON.stringify(recent));
+    renderRecentlyViewed();
+  }
+
+  function renderRecentlyViewed() {
+    let recent = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    if(recent.length === 0) {
+      recentlyViewedSection.style.display = 'none';
+      return;
+    }
+    recentlyViewedSection.style.display = 'block';
+    recentList.innerHTML = '';
+
+    recent.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'recent-item';
+      div.textContent = item.title;
+      div.tabIndex = 0;
+      div.setAttribute('role', 'button');
+      div.setAttribute('aria-pressed', 'false');
+      div.addEventListener('click', () => {
+        viewerTitle.textContent = item.title;
+        noteViewer.src = item.file;
+        viewerContainer.style.display = 'block';
+        addToRecentlyViewed(item);
+      });
+      div.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          div.click();
+        }
+      });
+      recentList.appendChild(div);
+    });
+  }
+
+  // Search input event
+  searchBar.addEventListener('input', filterNotes);
+
+  // Initial render
+  filterNotes();
+  renderRecentlyViewed();
+
+  // Accessibility: close viewer on ESC key
+  window.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && viewerContainer.style.display === 'block') {
+      viewerContainer.style.display = 'none';
+      noteViewer.src = '';
+      viewerTitle.textContent = '';
+    }
+  });
+</script>
+</body>
+</html>
